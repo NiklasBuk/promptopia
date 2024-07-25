@@ -6,18 +6,18 @@ import { useState, useEffect } from 'react'
 import { signIn, signOut, useSession, getProviders } from 'next-auth/react'
 
 const Nav = () => {
-	const isUserLogged = true
+	const { data: session } = useSession()
 
 	const [providers, setProviders] = useState<any | null>(null)
-	const [toggleDropdown, setToggleDropdown] = useState(false)
+	const [toggleDropdown, setToggleDropdown] = useState<boolean>(false)
 
 	useEffect(() => {
-		const setProvider = async () => {
+		const setUpProviders = async () => {
 			const response = await getProviders()
 
 			setProviders(response)
 		}
-		setProvider()
+		setUpProviders()
 	}, [])
 
 	return (
@@ -35,7 +35,7 @@ const Nav = () => {
 
 			{/*Desktop Navigation*/}
 			<div className='sm:flex hidden'>
-				{isUserLogged ? (
+				{session?.user ? (
 					<div className='flex gap-3 md:gap-5 items-center'>
 						<Link href={'/create-prompt'} className='black_btn'>
 							Create Post
@@ -45,7 +45,7 @@ const Nav = () => {
 						</button>
 						<Link href={'/profile'}>
 							<Image
-								src='/assets/images/logo.svg'
+								src={session?.user.image}
 								width={30}
 								height={30}
 								className='rounded-full'
@@ -72,10 +72,10 @@ const Nav = () => {
 
 			{/*Mobile Navigation*/}
 			<div className='sm:hidden flex relative'>
-				{isUserLogged ? (
+				{session?.user ? (
 					<div className='flex items-center'>
 						<Image
-							src='/assets/images/logo.svg'
+							src={session?.user.image}
 							width={30}
 							height={30}
 							className='rounded-full'
