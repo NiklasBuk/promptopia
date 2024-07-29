@@ -12,32 +12,31 @@ const handler = NextAuth({
 	],
 	callbacks: {
 		async session({ session }) {
+			// store user id from mongo to session
 			const sessionUser = await User.findOne({ email: session.user.email })
 
 			session.user.id = sessionUser._id.toString()
 
 			return session
 		},
-		async signIn({ profile }) {
+		async signIn({ account, profile, user, credentials }) {
 			try {
 				// every nextjs route is serverless route -> Lambda fn (opens only when its get called) -> dynamodb
 				await connectToDB()
 
 				// check if a user already exist
-				const userExists = await User.findOne({
-					email: profile.email
-				})
+				const userExists = await User.findOne({ email: profile.email })
 				// if not, create a new user
 				if (!userExists) {
 					await User.create({
 						email: profile.email,
-						username: profile.username.replace(' ', '').toLowerCase(),
-						image: profile.image
+						username: profile.name.replace(' ', '').toLowerCase(),
+						image: profile.picture
 					})
 				}
 				return true
 			} catch (error) {
-				console.log(error)
+				console.log('Error checking if user exists: ', error.message)
 				return false
 			}
 		}
