@@ -3,7 +3,7 @@ import { PromptType } from '@app/create-prompt/page'
 import Link from 'next/link'
 
 type FormType = {
-	type: 'Create'
+	type: 'Create' | 'Edit'
 	post: PromptType
 	setPost: (PromptType) => void
 	submitting: boolean
